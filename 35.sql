@@ -71,3 +71,22 @@ order by sort_order;
 create or replace rule v_object_widget_upd_vcount as
 	on update to v_object_widget do instead update re_object set count_view = count_view + 1
 	where id = NEW.id;
+
+
+insert into email_templates(name, tpl_file, tpl_vars)
+values('Информация об объекте UMLS', 'email/share-object', '{{user_email}},{{user_name}},{{object_info | raw}}');
+
+
+alter table agents add column photo varchar(512) default '/img/noavatar.gif';
+
+
+create view v_agent_info as
+select 
+a.*,
+u.email,
+(select array_to_string(array_agg(p.phone), '||')
+from agents_phones p
+where p.agent_id = a.id) as phones
+from agents a
+
+join users u on (u.id = a.user_id);
