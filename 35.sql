@@ -80,13 +80,16 @@ values('Информация об объекте UMLS', 'email/share-object', '{
 alter table agents add column photo varchar(512) default '/img/noavatar.gif';
 
 
+drop view if exists v_agent_info;
+
 create view v_agent_info as
 select 
 a.*,
 u.email,
-(select array_to_string(array_agg(p.phone), '||')
+(select array_to_string(array_prepend(u.phone, array_agg(p.phone)), '||')
 from agents_phones p
 where p.agent_id = a.id) as phones
+
 from agents a
 
 join users u on (u.id = a.user_id);
