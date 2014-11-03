@@ -82,7 +82,12 @@ SELECT o.id,
    ct.city AS city_name,
    cta.name AS cityarea_name,
    cr.short_name AS currency,
-   o.price / o.area_res::double precision AS price_for_sqm
+   o.price / o.area_res::double precision AS price_for_sqm,
+   ( SELECT g.path_to_file
+           FROM re_object_gal g
+          WHERE o.id = g.object_id
+          ORDER BY g.sort_order
+         LIMIT 1) AS pic
   FROM re_object o
     JOIN transaction_types tt ON o.transaction_type = tt.type_code
     JOIN re_category c ON o.category_id = c.id AND c.parent <> 0
