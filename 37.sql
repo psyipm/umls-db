@@ -32,7 +32,11 @@ CREATE OR REPLACE FUNCTION convert_to_usd
 	LANGUAGE 'plpgsql';
 
 
-create view v_re_object_by_price as
+
+
+-- DROP VIEW v_re_object_by_price;
+
+CREATE OR REPLACE VIEW v_re_object_by_price AS 
 
 SELECT o.id,
    o.transaction_type,
@@ -83,6 +87,7 @@ SELECT o.id,
    cta.name AS cityarea_name,
    cr.short_name AS currency,
    o.price / o.area_res::double precision AS price_for_sqm,
+   f.id as favorites,
    ( SELECT g.path_to_file
            FROM re_object_gal g
           WHERE o.id = g.object_id
@@ -94,10 +99,10 @@ SELECT o.id,
     JOIN geo_city ct ON o.city_id = ct.id
     LEFT JOIN geo_cityarea cta ON o.cityarea_id = cta.id
     JOIN currency cr ON o.currency_id = cr.id
+    LEFT JOIN favorites f ON f.object_id = o.id AND f.user_id = CAST(get_var('user_id') AS INTEGER)
    where 
    convert_to_usd(o.price, o.currency_id)
    between
        convert_to_usd(CAST(get_var('price_min') AS DOUBLE PRECISION), CAST(get_var('currency_id') AS INTEGER))
        and
        convert_to_usd(CAST(get_var('price_max') AS DOUBLE PRECISION), CAST(get_var('currency_id') AS INTEGER));
-    
