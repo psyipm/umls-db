@@ -24,8 +24,14 @@ ALTER TABLE favorites ALTER COLUMN date_add
 SET DEFAULT CURRENT_DATE;
 
 
+DROP VIEW IF EXISTS v_my_favorite_objects;
 create view v_my_favorite_objects as
 
-select o.* from favorites f
-join v_my_objects o on (o.id = f.object_id)
+select 
+	o.*,
+	f.id as favorites,
+	os.name as state_name
+from favorites f
+	join v_my_objects o on (o.id = f.object_id)
+	join object_states os on (o.state = os.code)
 where f.user_id = (select cast(get_var('user_id') as integer));
