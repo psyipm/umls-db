@@ -54,3 +54,9 @@ group by p.id
 
 
 order by sort_order;
+
+
+
+insert into permissions(permission, descr)
+values('user-interface\umls-objects', 'Доступ к разделу "Объекты UMLS"'),
+	('user-interface\umls-objects\statistics', 'Доступ к разделу "Статистика"');
